@@ -1,14 +1,15 @@
 import sympy
+import itertools
 from sympy.parsing.sympy_parser import parse_expr
 
 import numpy
 
 # input : function variables from user (as space separated string)
 # function variables 'f_vars'
-f_vars_string = 'x1 x2'
+f_vars_string = 'x'
 # input : function input from user (as normal python expression using the above variables)
-f_string = 'x1**3 + 5*x1**2*x2 + 7*x1*x2**2 + 2*x2**3'
-
+f_string = '(x-3)*((x-5)**2)*(3*x-16)'
+# x1**3 + 5*x1**2*x2 + 7*x1*x2**2 + 2*x2**3
 
 var_str_list = f_vars_string.split()
 # print(type(var_str_list))
@@ -26,12 +27,9 @@ while k < n:
     ab[key] = value
     k += 1
 
-# Parse the input function string as SymPy expression
-f = parse_expr(f_string)
-
 
 def gradient(function):
-    print(n)
+    #print(n)
     g = [None]*n
     it = 0
     for x in ab.keys():
@@ -60,26 +58,33 @@ def mat(list_object):
 
 def evaluate(grid, x):
     #replacements = {key: value for (key, value) in zip}
-    replacements = dict(zip(var_str_list, list(x)))
+    xz = list(itertools.chain.from_iterable(x.tolist()))
+    replacements = dict(zip(var_str_list, xz))
     evaluator = lambda t: t.evalf(subs=replacements)
     vfunc = numpy.vectorize(evaluator)
-    return vfunc(grid)
+    out_grid = vfunc(grid)
+    return out_grid
 
 def improve(old_x, grad, jaco):
     g_x0 = evaluate(grad, old_x)
     j_x0 = evaluate(jaco, old_x)
-    new_x = old_x - numpy.dot(numpy.linalg.inv(j_x0), g_x0)
+    if n == 1:
+        j_inv = 1/j_x0.item(0)
+        g = g_x0.item(0)
+    else:
+        j_inv = numpy.linalg.inv(j_x0)
+    new_x = old_x - numpy.dot(j_inv, g)
     return new_x
 
 def minimize_NR(function, x0):
     x = []
-    x.append(numpy.matrix(zip(*[iter(x0)]*1)))
+    x.append(numpy.matrix(list(zip(*[iter(x0)]*1))))
     grad = gradient(f)
     jaco = jacobian(f)
     i = 0
     gap = 1
     new_x = 'inf'
-    while(gap > 0.01):
+    while(gap > 0.00001):
         old_x = x[i]
         new_x = improve(old_x, grad, jaco)
         gap = new_x - old_x
@@ -88,9 +93,18 @@ def minimize_NR(function, x0):
     return new_x
 
 
-
+# Parse the input function string as SymPy expression
+f = parse_expr(f_string)
+f = sympy.integrate(f)
+print(sympy.expand(f))
+x0 = [1]
+ans = minimize_NR(f, x0)
+print('ans is: ', ans)
+print('gradient at ', ans, 'is ', evaluate(gradient(f), ans))
+'''
 grad = gradient(f)
 hess = hessian(f)
 print(f)
 print(grad)
 print(hess)
+'''
