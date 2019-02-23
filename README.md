@@ -20,4 +20,10 @@ through Symbolic expressions
     3.1.4 Fibonacci Method
     
 Work in Progress:
-2/22/2019 - calculate gradient, hessian, Taylor's series approximation
+2/22/2019
+1. Classical Newton's method is implemented and works for higher dimensional functions.
+2. Needs exception handling when Jacobian becomes Singular matrix.
+3. To test it, change the input on lines 9, 12 and 14
+    3.1) line 9 : input function variables
+    3.2) line 12 : input function
+    3.3) line 14 : input starting point x0
