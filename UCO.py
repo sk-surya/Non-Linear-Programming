@@ -94,24 +94,26 @@ def modifier(A):
 def find_ab(fn):
     a = 0
     i = 1
-    if fn.evalf(subs={theta: a}) > 0:
+    if fn.evalf(subs={theta: a}) > 0.001:
         while True:
-            if fn.evalf(subs={theta: i}) < 0:
+            if fn.evalf(subs={theta: i}) < 0.001:
                 b = i
                 break
-            elif fn.evalf(subs={theta: -i}) < 0:
+            elif fn.evalf(subs={theta: -i}) < 0.001:
                 b = -i
                 break
-            i *= 2
-    elif fn.evalf(subs={theta: a}) < 0:
+            #print(i)
+            i += 1
+    elif fn.evalf(subs={theta: a}) < 0.001:
         while True:
-            if fn.evalf(subs={theta: i}) > 0:
+            if fn.evalf(subs={theta: i}) > -0.009:
                 b = i
                 break
-            elif fn.evalf(subs={theta: -i}) > 0:
+            elif fn.evalf(subs={theta: -i}) > -0.009:
                 b = -i
                 break
-            i *= 2
+            #print(i)
+            i += 1
     else:
         b = 0
     return a, b
@@ -130,13 +132,13 @@ def Bisect(fn, a,b):
 
 def LineSearch(x_k, p_k, method):
     z_m = x_k + theta*(p_k)
-    print(z_m)
+    # print(z_m)
     z = flatten(z_m)
     replacements = dict(zip(var_str_list, z))
     f_theta = f.subs(replacements)
     # print(sympy.expand(f_theta))
     f_theta_1 = sympy.diff(f_theta)
-    # print(f_theta_1)
+    # print(sympy.expand(f_theta_1))
     a, b = find_ab(f_theta_1)
     # print('Initial Uncertainty interval : ', a, b)
     a, b = Bisect(f_theta_1, a, b)
@@ -158,11 +160,11 @@ def improve(old_x, grad, jaco, lm_mod):
     else:
         g = g_x0
         j_inv = numpy.linalg.inv(j_x0)
+        p_k = -1 * (numpy.dot(j_inv, g))
         if lm_mod == True:
             if is_pos_def(j_x0) == False:
                 mu = modifier(j_x0)
                 j_x0 = j_x0 + numpy.dot(mu, numpy.identity(n))
-                p_k = -1 * (numpy.dot(j_inv, g))
                 alpha = LineSearch(old_x, p_k, method='Bisection')
     new_x = old_x + alpha*p_k
     return new_x
