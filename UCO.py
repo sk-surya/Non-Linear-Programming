@@ -105,10 +105,3 @@ print(sympy.expand(f))
 ans = minimize_NR(f, x0)
 print('ans is: ', ans)
 print('gradient at ', ans, 'is ', evaluate(gradient(f), ans))
-'''
-grad = gradient(f)
-hess = hessian(f)
-print(f)
-print(grad)
-print(hess)
-'''
