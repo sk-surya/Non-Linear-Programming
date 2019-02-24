@@ -28,6 +28,7 @@ Update:
 1. Included Levenberg-Marquardt modification (guaranteed descent).
 2. To use LM modification, give lm_mod=True in function call minimize_NR(f, x0, lm_mod=True) in line 196. 
 3. lm_mod=False does Classical Newton's method with stepsize=1.
+4. Input : line 10, 13 and 18
 
 2/22/2019
 ---------
